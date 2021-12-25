@@ -54,7 +54,7 @@ func TestDay5Part2(t *testing.T) {
 			},
 			12,
 		},
-		// Checks diagnoal line draws in both directions
+		// Checks diagonal line draws in both directions
 		{
 			[]string{
 				"1,1 -> 3,3",
@@ -62,7 +62,7 @@ func TestDay5Part2(t *testing.T) {
 			},
 			0,
 		},
-		// Checks diagnoal line draws in both directions, with overlaps
+		// Checks diagonal line draws in both directions, with overlaps
 		{
 			[]string{
 				"0,0 -> 3,3",
@@ -70,7 +70,7 @@ func TestDay5Part2(t *testing.T) {
 			},
 			1,
 		},
-		// Checks diagnoal line draws in both directions, with all overlaps
+		// Checks diagonal line draws in both directions, with all overlaps
 		{
 			[]string{
 				"2,0 -> 0,2",

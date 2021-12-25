@@ -752,10 +752,10 @@ var (
 		{0, 1},   // Down
 		{-1, 0},  // Left
 		{1, 0},   // Right
-		{-1, -1}, // Diagnoal Up/Left
-		{1, -1},  // Diagnoal Up/Right
-		{-1, 1},  // Diagnoal Down/Left
-		{1, 1},   // Diagnoal Down/Right
+		{-1, -1}, // Diagonal Up/Left
+		{1, -1},  // Diagonal Up/Right
+		{-1, 1},  // Diagonal Down/Left
+		{1, 1},   // Diagonal Down/Right
 	}
 
 	day11RuleFunctions = map[Day11RuleOption](func(seatMap [][]rune, currentSeat day11SeatPosition) (validSeatPositions []day11SeatPosition)){
@@ -1204,7 +1204,7 @@ func Day14(data string) (sum int) {
 		additions := memMask.FindAllStringSubmatch(entry, -1)
 		for _, addition := range additions {
 			// log.Debugf("Memory location: %+v to: %+v", addition[1], addition[2])
-			// Initalise
+			// Initialise
 			_, ok := memory[addition[1]]
 			if !ok {
 				new := day14Bits{}
@@ -1284,7 +1284,7 @@ func Day14Part2(data string) (sum int) {
 		additions := memMask.FindAllStringSubmatch(entry, -1)
 		for _, addition := range additions {
 			log.Debugf("Memory location: %+v to: %+v", addition[1], addition[2])
-			// Initalise
+			// Initialise
 			write, _ := strconv.Atoi(addition[2])
 			address, _ := strconv.Atoi(addition[1])
 			_, ok := memory[address]
@@ -1816,7 +1816,7 @@ func Day16Part2(ticketData string) (errorRate int64) {
 // 	array.day17Print()
 // 	// replacement.day17Print()
 
-// 	// TOOD works, I think, uncomment
+// 	// TODO works, I think, uncomment
 // 	// for i := 1; i <= 1; i++ {
 // 	// 	array = array.day17Expand()
 // 	// 	array = array.day17Flip()
@@ -2478,6 +2478,7 @@ func day22Play(p1, p2 []int64, recursive bool, gamenumber int) ([]int64, []int64
 	return p1, p2
 }
 
+// Day22 entry function
 func Day22(data string, recursive bool) int {
 	playerdecks := map[string][]int64{}
 
@@ -2514,6 +2515,7 @@ func Day22(data string, recursive bool) int {
 	return int(score)
 }
 
+// Day23 entry function
 func Day23(cupOrder string, moves int) (finalOrder string) {
 	order := make([]int, len(cupOrder))
 	for index, cup := range cupOrder {

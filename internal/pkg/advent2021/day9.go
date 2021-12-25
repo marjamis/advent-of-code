@@ -9,14 +9,14 @@ import (
 	"github.com/marjamis/advent-of-code/pkg/helpers"
 )
 
-type HeightMap [][]int
+type heights [][]int
 
-type Point struct {
+type point struct {
 	row, col int
 	height   int
 }
 
-func createHeightMap(heightMapInput []string) (heightMap HeightMap) {
+func createHeightMap(heightMapInput []string) (heightMap heights) {
 	for _, row := range heightMapInput {
 		var outputRow = make([]int, len(row))
 		for col := range row {
@@ -32,7 +32,7 @@ func createHeightMap(heightMapInput []string) (heightMap HeightMap) {
 	return
 }
 
-func (hm HeightMap) print() {
+func (hm heights) print() {
 	for _, row := range hm {
 		for col := range row {
 			fmt.Printf("%+v", row[col])
@@ -41,7 +41,7 @@ func (hm HeightMap) print() {
 	}
 }
 
-func (hm HeightMap) isLowPoint(row, col int) bool {
+func (hm heights) isLowPoint(row, col int) bool {
 	current := hm[row][col]
 	// Above
 	if row >= 1 && hm[row-1][col] <= current {
@@ -65,11 +65,11 @@ func (hm HeightMap) isLowPoint(row, col int) bool {
 	return true
 }
 
-func (hm HeightMap) findLowPoints() (lowPoints []Point) {
+func (hm heights) findLowPoints() (lowPoints []point) {
 	for rowIndex, row := range hm {
 		for colIndex := range row {
 			if hm.isLowPoint(rowIndex, colIndex) {
-				lowPoints = append(lowPoints, Point{rowIndex, colIndex, hm[rowIndex][colIndex]})
+				lowPoints = append(lowPoints, point{rowIndex, colIndex, hm[rowIndex][colIndex]})
 			}
 		}
 	}
@@ -77,7 +77,7 @@ func (hm HeightMap) findLowPoints() (lowPoints []Point) {
 	return
 }
 
-func (hm HeightMap) isPartOfBasin(row, col, height int) bool {
+func (hm heights) isPartOfBasin(row, col, height int) bool {
 	if row > len(hm)-1 || row < 0 || col > len(hm[0])-1 || col < 0 {
 		return false
 	}
@@ -90,21 +90,21 @@ func (hm HeightMap) isPartOfBasin(row, col, height int) bool {
 	return false
 }
 
-func (hm HeightMap) findBasinSize(row, col int) (size int) {
-	validPoints := []Point{}
+func (hm heights) findBasinSize(row, col int) (size int) {
+	validPoints := []point{}
 	currentHeight := hm[row][col]
 
 	if hm.isPartOfBasin(row-1, col, currentHeight) {
-		validPoints = append(validPoints, Point{row - 1, col, 0})
+		validPoints = append(validPoints, point{row - 1, col, 0})
 	}
 	if hm.isPartOfBasin(row+1, col, currentHeight) {
-		validPoints = append(validPoints, Point{row + 1, col, 0})
+		validPoints = append(validPoints, point{row + 1, col, 0})
 	}
 	if hm.isPartOfBasin(row, col-1, currentHeight) {
-		validPoints = append(validPoints, Point{row, col - 1, 0})
+		validPoints = append(validPoints, point{row, col - 1, 0})
 	}
 	if hm.isPartOfBasin(row, col+1, currentHeight) {
-		validPoints = append(validPoints, Point{row, col + 1, 0})
+		validPoints = append(validPoints, point{row, col + 1, 0})
 	}
 
 	subs := 0
@@ -115,6 +115,7 @@ func (hm HeightMap) findBasinSize(row, col int) (size int) {
 	return len(validPoints) + subs
 }
 
+// Day9Part1 returns the risk level based on the low points
 func Day9Part1(heightMapInput []string) (riskLevel int) {
 	heightMap := createHeightMap(heightMapInput)
 
@@ -126,6 +127,7 @@ func Day9Part1(heightMapInput []string) (riskLevel int) {
 	return
 }
 
+// Day9Part2 returns the risk based on all the basins sizes
 func Day9Part2(heightMapInput []string) (riskLevel int) {
 	heightMap := createHeightMap(heightMapInput)
 
