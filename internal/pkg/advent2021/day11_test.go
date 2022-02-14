@@ -66,6 +66,7 @@ func TestStepOutput(t *testing.T) {
 		assert.Equal(t, test.expected, flashCount)
 	}
 }
+
 func TestDay11Part1(t *testing.T) {
 	tests := []struct {
 		input    OctopusEnergyMap

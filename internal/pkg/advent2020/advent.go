@@ -2609,7 +2609,7 @@ func Day23(cupOrder string, moves int) (finalOrder string) {
 			}
 
 			// No matter the next state increments the cursor position
-			i += 1
+			i++
 		}
 		break
 	}
