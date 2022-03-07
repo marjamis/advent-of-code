@@ -2,8 +2,10 @@ package advent2021
 
 import "fmt"
 
+// OctopusEnergyMap is the 2d positioning of all dumbo octopuses
 type OctopusEnergyMap [][]int
 
+// PointX is a row/col position
 type PointX struct {
 	row int
 	col int
@@ -16,6 +18,8 @@ func (oem OctopusEnergyMap) print() {
 		}
 		fmt.Println()
 	}
+
+	fmt.Println()
 }
 
 func (oem OctopusEnergyMap) listValidCells(row, col int) (validCells []PointX) {
@@ -90,14 +94,16 @@ func (oem OctopusEnergyMap) step() (numberOfFlashes int) {
 	return
 }
 
-func Day11Part1(initialEnergeyLevels [][]int) (countOfFlashes int) {
-	oem := OctopusEnergyMap(initialEnergeyLevels)
+// Day11Part1 returns the number of flashes from the dumbo octopuses
+func Day11Part1(initialEnergyLevels [][]int) (numberOfFlashes int) {
+	oem := OctopusEnergyMap(initialEnergyLevels)
+
 	oem.print()
-	fmt.Println()
+
 	for i := 0; i < 2; i++ {
-		countOfFlashes += oem.step()
+		numberOfFlashes += oem.step()
 		oem.print()
-		fmt.Println()
 	}
+
 	return
 }
