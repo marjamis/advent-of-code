@@ -39,6 +39,23 @@ func TestDay6Part1(t *testing.T) {
 	}
 }
 
+func TestCalculateSchoolGrowth(t *testing.T) {
+	tests := []struct {
+		initialTimer    int
+		daysToCalculate int
+		expected        int
+	}{
+		{
+			3,
+			28,
+			12,
+		},
+	}
+
+	for _, test := range tests {
+		assert.Equal(t, test.expected, calculateSchoolGrowth(test.initialTimer, test.daysToCalculate))
+	}
+}
 func TestDay6Part2(t *testing.T) {
 	tests := []struct {
 		input           []int
@@ -69,23 +86,5 @@ func TestDay6Part2(t *testing.T) {
 
 	for _, test := range tests {
 		assert.Equal(t, test.expected, Day6Part2(test.input, test.daysToCalculate))
-	}
-}
-
-func TestCalculateSchoolGrowth(t *testing.T) {
-	tests := []struct {
-		initialTimer    int
-		daysToCalculate int
-		expected        int
-	}{
-		{
-			3,
-			28,
-			12,
-		},
-	}
-
-	for _, test := range tests {
-		assert.Equal(t, test.expected, calculateSchoolGrowth(test.initialTimer, test.daysToCalculate))
 	}
 }

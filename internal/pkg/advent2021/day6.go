@@ -12,7 +12,7 @@ type Lanternfish struct {
 // School contains all the Lanternfish that are born
 type School []Lanternfish
 
-func (s School) printState() {
+func (s School) print() {
 	for _, fish := range s {
 		fmt.Printf("%d, ", fish.timer)
 	}
@@ -48,8 +48,17 @@ func simulateSchoolGrowth(school School, daysToSimulate int) int {
 }
 
 // calculateSchoolGrowth simulates the number of fish after the provided number of days
-func calculateSchoolGrowth(initialTimer, daysToCalculate int) int {
-	return 0
+func calculateSchoolGrowth(initialTimer, daysToCalculate int) (total int) {
+	// initialTimer until it spawns a fish
+	daysToCalculate -= initialTimer
+	total++
+	// first timer until spawn new fish
+
+	// secondary timer until subsequent children
+
+	// The above applies to all subsequent children
+
+	return
 }
 
 // Day6Part1 returns the number of fish
@@ -70,6 +79,8 @@ func Day6Part1(initialTimers []int, daysToSimulate int) int {
 func Day6Part2(initialTimers []int, daysToCalculate int) (schoolSize int) {
 	// Calculating the number of fish spawned based off of each possible initial timer based on the number of days
 	initials := []int{
+		// Requires the 0 to have the indexing on 0 return a zero.
+		// Alternatively I could -1 from the index but this is neater to me
 		0,
 		calculateSchoolGrowth(1, daysToCalculate),
 		calculateSchoolGrowth(2, daysToCalculate),
