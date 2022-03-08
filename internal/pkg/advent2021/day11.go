@@ -5,13 +5,13 @@ import "fmt"
 // OctopusEnergyMap is the 2d positioning of all dumbo octopuses
 type OctopusEnergyMap [][]int
 
-// PointX is a row/col position
-type PointX struct {
+// Coordinates is a row/col position on a 2D matrix
+type Coordinates struct {
 	row int
 	col int
 }
 
-var flashed = []PointX{}
+var flashedThisStep = []Coordinates{}
 
 func (oem OctopusEnergyMap) print() {
 	for _, row := range oem {
@@ -24,55 +24,54 @@ func (oem OctopusEnergyMap) print() {
 	fmt.Println()
 }
 
-func (oem OctopusEnergyMap) listValidCells(row, col int) (validCells []PointX) {
-	// TODO make this more generic
+func (oem OctopusEnergyMap) getSurroundingOctopuses(row, col int) (surroundingOctopuses []Coordinates) {
 	// Above
 	if row >= 1 {
-		validCells = append(validCells, PointX{row - 1, col})
+		surroundingOctopuses = append(surroundingOctopuses, Coordinates{row - 1, col})
 	}
 	// Below
 	if row < (len(oem) - 1) {
-		validCells = append(validCells, PointX{row + 1, col})
+		surroundingOctopuses = append(surroundingOctopuses, Coordinates{row + 1, col})
 	}
 
 	// Left
 	if col >= 1 {
-		validCells = append(validCells, PointX{row, col - 1})
+		surroundingOctopuses = append(surroundingOctopuses, Coordinates{row, col - 1})
 	}
 
 	// Right
 	if col < (len(oem[row]) - 1) {
-		validCells = append(validCells, PointX{row, col + 1})
+		surroundingOctopuses = append(surroundingOctopuses, Coordinates{row, col + 1})
 	}
 
 	// Diagonal Above/Left
 	if row >= 1 && col >= 1 {
-		validCells = append(validCells, PointX{row - 1, col - 1})
+		surroundingOctopuses = append(surroundingOctopuses, Coordinates{row - 1, col - 1})
 	}
 
 	// Diagonal Above/Right
 	if row >= 1 && col < (len(oem[row])-1) {
-		validCells = append(validCells, PointX{row - 1, col + 1})
+		surroundingOctopuses = append(surroundingOctopuses, Coordinates{row - 1, col + 1})
 	}
 
 	// Diagonal Below/Right
 	if row < (len(oem)-1) && col < (len(oem[row])-1) {
-		validCells = append(validCells, PointX{row + 1, col + 1})
+		surroundingOctopuses = append(surroundingOctopuses, Coordinates{row + 1, col + 1})
 	}
 
 	// Diagonal Below/Left
 	if row < (len(oem)-1) && col >= 1 {
-		validCells = append(validCells, PointX{row + 1, col - 1})
+		surroundingOctopuses = append(surroundingOctopuses, Coordinates{row + 1, col - 1})
 	}
 
 	return
 }
 
 func (oem OctopusEnergyMap) flash() (numberOfFlashes int) {
-	increasingPoints := []PointX{}
+	flashingOctopuses := []Coordinates{}
 
-	alreadyFlashed := func(row, col int) bool {
-		for _, f1 := range flashed {
+	hasFlashed := func(row, col int) bool {
+		for _, f1 := range flashedThisStep {
 			if f1.row == row && f1.col == col {
 				return true
 			}
@@ -82,23 +81,23 @@ func (oem OctopusEnergyMap) flash() (numberOfFlashes int) {
 
 	for row := 0; row < len(oem); row++ {
 		for col := 0; col < len(oem[row]); col++ {
-			if oem[row][col] > 9 && !alreadyFlashed(row, col) {
-				newPoint := &PointX{
+			if oem[row][col] > 9 && !hasFlashed(row, col) {
+				newPoint := &Coordinates{
 					row: row,
 					col: col,
 				}
-				increasingPoints = append(increasingPoints, *newPoint)
-				flashed = append(flashed, *newPoint)
+				flashingOctopuses = append(flashingOctopuses, *newPoint)
+				flashedThisStep = append(flashedThisStep, *newPoint)
 				numberOfFlashes++
 			}
 		}
 	}
 
-	for _, increasingPoint := range increasingPoints {
-		validCells := oem.listValidCells(increasingPoint.row, increasingPoint.col)
-		for _, validCell := range validCells {
-			oem[validCell.row][validCell.col] = increase(oem[validCell.row][validCell.col])
-			if oem[validCell.row][validCell.col] > 9 {
+	for _, flashingOctopus := range flashingOctopuses {
+		surroundingOctopuses := oem.getSurroundingOctopuses(flashingOctopus.row, flashingOctopus.col)
+		for _, octopus := range surroundingOctopuses {
+			oem[octopus.row][octopus.col] = increase(oem[octopus.row][octopus.col])
+			if oem[octopus.row][octopus.col] > 9 {
 				numberOfFlashes += oem.flash()
 			}
 		}
@@ -110,7 +109,6 @@ func (oem OctopusEnergyMap) flash() (numberOfFlashes int) {
 func (oem OctopusEnergyMap) mapping(function func(value int) int) {
 	for row := 0; row < len(oem); row++ {
 		for col := 0; col < len(oem[row]); col++ {
-			// TODO should the assigning happen here or in the function call?
 			oem[row][col] = function(oem[row][col])
 		}
 	}
@@ -134,7 +132,7 @@ func (oem OctopusEnergyMap) step() (numberOfFlashes int) {
 	// Each one greater than 9 flashes, including surrounding continue until no additional changes
 	numberOfFlashes = oem.flash()
 	// Reseting the flashed list between steps as each step can allow flashing again
-	flashed = []PointX{}
+	flashedThisStep = []Coordinates{}
 	// Any flashed octopus is set to zero
 	oem.mapping(setToZero)
 
