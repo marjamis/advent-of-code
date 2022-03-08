@@ -1,6 +1,10 @@
 package advent2021
 
-import "fmt"
+import (
+	"fmt"
+
+	"github.com/marjamis/advent-of-code/pkg/helpers"
+)
 
 // OctopusEnergyMap is the 2d positioning of all dumbo octopuses
 type OctopusEnergyMap [][]int
@@ -127,16 +131,14 @@ func setToZero(value int) int {
 }
 
 func (oem OctopusEnergyMap) step() (numberOfFlashes int) {
-	// Each octopus is increased by one
+	// Each octopus energy level is increased by one
 	oem.mapping(increase)
-	// Each one greater than 9 flashes, including surrounding continue until no additional changes
+	// Each octopus with an energy level greater than 9 flashes, includes increasin surrounding octopuses engery levels. Continues until no additional flashes
 	numberOfFlashes = oem.flash()
-	// Reseting the flashed list between steps as each step can allow flashing again
+	// Resetting the flashed list between steps as each step can allow flashing again
 	flashedThisStep = []Coordinates{}
 	// Any flashed octopus is set to zero
 	oem.mapping(setToZero)
-
-	oem.print()
 
 	return
 }
@@ -154,9 +156,8 @@ func (oem OctopusEnergyMap) isSynchonised() bool {
 
 // Day11Part1 returns the number of flashes from the dumbo octopuses
 func Day11Part1(initialEnergyLevels [][]int) (numberOfFlashes int) {
-	oem := OctopusEnergyMap(initialEnergyLevels)
-
-	// oem.print()
+	// Creates a copy of the array to ensure its not changing the original data
+	oem := OctopusEnergyMap(helpers.Copy2dInt(initialEnergyLevels))
 
 	for i := 0; i < 100; i++ {
 		numberOfFlashes += oem.step()
@@ -167,9 +168,8 @@ func Day11Part1(initialEnergyLevels [][]int) (numberOfFlashes int) {
 
 // Day11Part2 returns the first step in which all dumbo octopuses flash at the same time
 func Day11Part2(initialEnergyLevels [][]int) (synchronisedFlashStep int) {
-	oem := OctopusEnergyMap(initialEnergyLevels)
-
-	oem.print()
+	// Creates a copy of the array to ensure its not changing the original data
+	oem := OctopusEnergyMap(helpers.Copy2dInt(initialEnergyLevels))
 
 	// Starting a 1 as there isn't a step 0 in this calculation
 	for synchronisedFlashStep = 1; ; synchronisedFlashStep++ {
