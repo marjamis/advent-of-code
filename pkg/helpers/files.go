@@ -160,3 +160,25 @@ func RemoveDuplicates(data []string) (uniques []string) {
 
 	return uniques
 }
+
+// ReadIntArray2d reads from file and returns a [][]int
+func ReadIntArray2d(file string) (ints [][]int) {
+	fdata, _ := os.Open(file)
+	defer fdata.Close()
+
+	scanner := bufio.NewScanner(fdata)
+	scanner.Split(bufio.ScanLines)
+	for scanner.Scan() {
+		subInts := []int{}
+		for _, c := range scanner.Text() {
+			tmpI, err := strconv.Atoi(string(c))
+			if err != nil {
+				log.Fatal("Couldn't convert file")
+			}
+			subInts = append(subInts, tmpI)
+		}
+		ints = append(ints, subInts)
+	}
+
+	return
+}

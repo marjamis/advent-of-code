@@ -56,3 +56,15 @@ func DecimalPositionOf(desiredPosition int) (positionValue int) {
 
 	return
 }
+
+// Copy2dInt creates a copy of a 2d array
+// TODO convert to a generic in the future with an applicable golang version
+func Copy2dInt(array [][]int) (copied [][]int) {
+	for _, i := range array {
+		tmp := make([]int, len(i))
+		copy(tmp, i)
+		copied = append(copied, tmp)
+	}
+
+	return
+}
