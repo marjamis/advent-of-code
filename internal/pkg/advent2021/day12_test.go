@@ -17,7 +17,14 @@ func TestFilterSmallCavesFromPath(t *testing.T) {
 	assert.False(t, filterSmallCavesFromPath([]string{"c", "A"}, "A"))
 }
 
-func TestCanVisit(t *testing.T) {
+func TestFilterUpdatedSmallCavesFromPath(t *testing.T) {
+	// assert.False(t, filterUpdatedSmallCavesFromPath([]string{"A", "c"}, "c"))
+	// assert.False(t, filterUpdatedSmallCavesFromPath([]string{"c", "A"}, "A"))
+	assert.True(t, filterUpdatedSmallCavesFromPath([]string{
+		"start", "A", "c", "A", "c", "A", "b", "A"}, "b"))
+}
+
+func TestCavesToVisitV1(t *testing.T) {
 	testCaves := Caves(helpers.LoadNodes(
 		[]string{
 			"start-A",
@@ -30,20 +37,29 @@ func TestCanVisit(t *testing.T) {
 		},
 		"-"))
 
-	assert.ElementsMatch(t, []string{"c", "end"}, testCaves.cavesToVisit([]string{
+	assert.ElementsMatch(t, []string{"c", "end"}, cavesToVisit(Filters{
+		start:      filterStart,
+		smallCaves: filterSmallCavesFromPath,
+	}, testCaves, []string{
 		"start", "A", "b", "A",
 	}))
 
-	assert.ElementsMatch(t, []string{"A"}, testCaves.cavesToVisit([]string{
+	assert.ElementsMatch(t, []string{"A"}, cavesToVisit(Filters{
+		start:      filterStart,
+		smallCaves: filterSmallCavesFromPath,
+	}, testCaves, []string{
 		"start", "A", "b", "A", "c",
 	}))
 
-	assert.ElementsMatch(t, []string{"end"}, testCaves.cavesToVisit([]string{
+	assert.ElementsMatch(t, []string{"end"}, cavesToVisit(Filters{
+		start:      filterStart,
+		smallCaves: filterSmallCavesFromPath,
+	}, testCaves, []string{
 		"start", "A", "b", "A", "c", "A",
 	}))
 }
 
-func TestTraverse(t *testing.T) {
+func TestTraverseV1(t *testing.T) {
 	tests := []struct {
 		input    Caves
 		expected int
@@ -108,6 +124,81 @@ func TestTraverse(t *testing.T) {
 	}
 
 	for _, test := range tests {
-		assert.Equal(t, test.expected, test.input.traverse("start", []string{}))
+		assert.Equal(t, test.expected, traverse(test.input, "start", []string{}, Filters{
+			start:      filterStart,
+			smallCaves: filterSmallCavesFromPath,
+		}))
+	}
+}
+
+func TestTraverseV2(t *testing.T) {
+	tests := []struct {
+		input    Caves
+		expected int
+	}{
+		{
+			Caves(helpers.LoadNodes(
+				[]string{
+					"start-A",
+					"start-b",
+					"A-c",
+					"A-b",
+					"b-d",
+					"A-end",
+					"b-end",
+				},
+				"-")),
+			36,
+		},
+		// {
+		// 	Caves(helpers.LoadNodes(
+		// 		[]string{
+		// 			"dc-end",
+		// 			"HN-start",
+		// 			"start-kj",
+		// 			"dc-start",
+		// 			"dc-HN",
+		// 			"LN-dc",
+		// 			"HN-end",
+		// 			"kj-sa",
+		// 			"kj-HN",
+		// 			"kj-dc",
+		// 		},
+		// 		"-")),
+		// 	103,
+		// },
+		// {
+		// 	Caves(helpers.LoadNodes(
+		// 		[]string{
+		// 			"fs-end",
+		// 			"he-DX",
+		// 			"fs-he",
+		// 			"start-DX",
+		// 			"pj-DX",
+		// 			"end-zg",
+		// 			"zg-sl",
+		// 			"zg-pj",
+		// 			"pj-he",
+		// 			"RW-he",
+		// 			"fs-DX",
+		// 			"pj-RW",
+		// 			"zg-RW",
+		// 			"start-pj",
+		// 			"he-WI",
+		// 			"zg-he",
+		// 			"pj-fs",
+		// 			"start-RW",
+		// 		},
+		// 		"-",
+		// 	)),
+		// 	3509,
+		// },
+	}
+
+	for _, test := range tests {
+		assert.Equal(t, test.expected, traverse(test.input, "start", []string{}, Filters{
+			start:      filterStart,
+			smallCaves: filterUpdatedSmallCavesFromPath,
+		}))
 	}
 }

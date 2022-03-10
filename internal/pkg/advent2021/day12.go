@@ -12,6 +12,13 @@ type Cave helpers.Node
 // Caves is a map of all the caves in the puzzle
 type Caves helpers.Nodes
 
+// Filters is a struct to pass around functions signatures for the filters to allow for a
+// generic implementation while calling specific filters
+type Filters struct {
+	start      func(string) bool
+	smallCaves func([]string, string) bool
+}
+
 func filterStart(caveName string) bool {
 	if caveName == "start" {
 		return true
@@ -34,7 +41,18 @@ func filterSmallCavesFromPath(pathSoFar []string, currentCave string) bool {
 	return false
 }
 
-func (caves Caves) cavesToVisit(pathSoFar []string) (validNextCaves []string) {
+func filterUpdatedSmallCavesFromPath(pathSoFar []string, currentCave string) bool {
+	// If it's a big cave then it remains a valid path
+	if strings.ToUpper(currentCave) == currentCave {
+		return false
+	}
+
+	// Allow one small cave to have two visits but all others one. Filter any that try for a second
+
+	return false
+}
+
+func cavesToVisit(filters Filters, caves Caves, pathSoFar []string) (validNextCaves []string) {
 	// Get a list of all the current caves (last element in pathSoFar) connections
 	// for the beginnings of next cave to explore
 	for _, i := range caves[pathSoFar[len(pathSoFar)-1]].Edges {
@@ -45,7 +63,7 @@ func (caves Caves) cavesToVisit(pathSoFar []string) (validNextCaves []string) {
 	// TODO make it a filter
 	remove := []int{}
 	for i, possibility := range validNextCaves {
-		if filterStart(possibility) {
+		if filters.start(possibility) {
 			remove = append(remove, i)
 		}
 	}
@@ -55,7 +73,7 @@ func (caves Caves) cavesToVisit(pathSoFar []string) (validNextCaves []string) {
 	// TODO make it a filter
 	remove = []int{}
 	for i, possibility := range validNextCaves {
-		if filterSmallCavesFromPath(pathSoFar, possibility) {
+		if filters.smallCaves(pathSoFar, possibility) {
 			remove = append(remove, i)
 		}
 	}
@@ -64,7 +82,7 @@ func (caves Caves) cavesToVisit(pathSoFar []string) (validNextCaves []string) {
 	return validNextCaves
 }
 
-func (caves Caves) traverse(nextCave string, pathSoFar []string) (totalPaths int) {
+func traverse(caves Caves, nextCave string, pathSoFar []string, filters Filters) (totalPaths int) {
 	pathSoFar = append(pathSoFar, nextCave)
 	if nextCave == "end" {
 		// If this next cave is the end then it's a valid path to end on
@@ -72,8 +90,8 @@ func (caves Caves) traverse(nextCave string, pathSoFar []string) (totalPaths int
 	} else {
 		// Find all caves that can be visited and then continually traverse these until they fail
 		// or they find the end cave
-		for _, caveToVisit := range caves.cavesToVisit(pathSoFar) {
-			totalPaths += caves.traverse(caveToVisit, pathSoFar)
+		for _, caveToVisit := range cavesToVisit(filters, caves, pathSoFar) {
+			totalPaths += traverse(caves, caveToVisit, pathSoFar, filters)
 		}
 	}
 
@@ -84,5 +102,18 @@ func (caves Caves) traverse(nextCave string, pathSoFar []string) (totalPaths int
 func Day12Part1(rawData []string) int {
 	caves := Caves(helpers.LoadNodes(rawData, "-"))
 
-	return caves.traverse("start", []string{})
+	return traverse(caves, "start", []string{}, Filters{
+		start:      filterStart,
+		smallCaves: filterSmallCavesFromPath,
+	})
+}
+
+// Day12Part2 returns the number of paths from the start to the end based on the updated rules
+func Day12Part2(rawData []string) int {
+	caves := Caves(helpers.LoadNodes(rawData, "-"))
+
+	return traverse(caves, "start", []string{}, Filters{
+		start:      filterStart,
+		smallCaves: filterUpdatedSmallCavesFromPath,
+	})
 }
