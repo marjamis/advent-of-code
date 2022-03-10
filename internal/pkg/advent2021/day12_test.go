@@ -18,13 +18,13 @@ func TestFilterSmallCavesFromPath(t *testing.T) {
 }
 
 func TestFilterUpdatedSmallCavesFromPath(t *testing.T) {
-	// assert.False(t, filterUpdatedSmallCavesFromPath([]string{"A", "c"}, "c"))
-	// assert.False(t, filterUpdatedSmallCavesFromPath([]string{"c", "A"}, "A"))
+	assert.False(t, filterUpdatedSmallCavesFromPath([]string{"A", "c"}, "c"))
+	assert.False(t, filterUpdatedSmallCavesFromPath([]string{"c", "A"}, "A"))
 	assert.True(t, filterUpdatedSmallCavesFromPath([]string{
 		"start", "A", "c", "A", "c", "A", "b", "A"}, "b"))
 }
 
-func TestCavesToVisitV1(t *testing.T) {
+func TestCavesToVisitP1(t *testing.T) {
 	testCaves := Caves(helpers.LoadNodes(
 		[]string{
 			"start-A",
@@ -59,7 +59,7 @@ func TestCavesToVisitV1(t *testing.T) {
 	}))
 }
 
-func TestTraverseV1(t *testing.T) {
+func TestTraverseP1(t *testing.T) {
 	tests := []struct {
 		input    Caves
 		expected int
@@ -131,7 +131,7 @@ func TestTraverseV1(t *testing.T) {
 	}
 }
 
-func TestTraverseV2(t *testing.T) {
+func TestTraverseP2(t *testing.T) {
 	tests := []struct {
 		input    Caves
 		expected int
@@ -150,49 +150,49 @@ func TestTraverseV2(t *testing.T) {
 				"-")),
 			36,
 		},
-		// {
-		// 	Caves(helpers.LoadNodes(
-		// 		[]string{
-		// 			"dc-end",
-		// 			"HN-start",
-		// 			"start-kj",
-		// 			"dc-start",
-		// 			"dc-HN",
-		// 			"LN-dc",
-		// 			"HN-end",
-		// 			"kj-sa",
-		// 			"kj-HN",
-		// 			"kj-dc",
-		// 		},
-		// 		"-")),
-		// 	103,
-		// },
-		// {
-		// 	Caves(helpers.LoadNodes(
-		// 		[]string{
-		// 			"fs-end",
-		// 			"he-DX",
-		// 			"fs-he",
-		// 			"start-DX",
-		// 			"pj-DX",
-		// 			"end-zg",
-		// 			"zg-sl",
-		// 			"zg-pj",
-		// 			"pj-he",
-		// 			"RW-he",
-		// 			"fs-DX",
-		// 			"pj-RW",
-		// 			"zg-RW",
-		// 			"start-pj",
-		// 			"he-WI",
-		// 			"zg-he",
-		// 			"pj-fs",
-		// 			"start-RW",
-		// 		},
-		// 		"-",
-		// 	)),
-		// 	3509,
-		// },
+		{
+			Caves(helpers.LoadNodes(
+				[]string{
+					"dc-end",
+					"HN-start",
+					"start-kj",
+					"dc-start",
+					"dc-HN",
+					"LN-dc",
+					"HN-end",
+					"kj-sa",
+					"kj-HN",
+					"kj-dc",
+				},
+				"-")),
+			103,
+		},
+		{
+			Caves(helpers.LoadNodes(
+				[]string{
+					"fs-end",
+					"he-DX",
+					"fs-he",
+					"start-DX",
+					"pj-DX",
+					"end-zg",
+					"zg-sl",
+					"zg-pj",
+					"pj-he",
+					"RW-he",
+					"fs-DX",
+					"pj-RW",
+					"zg-RW",
+					"start-pj",
+					"he-WI",
+					"zg-he",
+					"pj-fs",
+					"start-RW",
+				},
+				"-",
+			)),
+			3509,
+		},
 	}
 
 	for _, test := range tests {

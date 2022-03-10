@@ -48,6 +48,38 @@ func filterUpdatedSmallCavesFromPath(pathSoFar []string, currentCave string) boo
 	}
 
 	// Allow one small cave to have two visits but all others one. Filter any that try for a second
+	// First count all the small caves that exist
+	counts := map[string]int{}
+	for _, p := range pathSoFar {
+		if p == strings.ToLower(p) {
+			_, ok := counts[p]
+			if !ok {
+				counts[p] = 1
+			} else {
+				counts[p]++
+			}
+		}
+	}
+
+	// Check if the one double is already taken
+	doubles := false
+	for _, c := range counts {
+		if c > 1 {
+			doubles = true
+		}
+	}
+
+	// Now loop through the path for the currentCave and if no doubles is found
+	// then it's still valid but if a double is already used it's not a valid path
+	for _, path := range pathSoFar {
+		if strings.Compare(currentCave, path) == 0 {
+			if doubles {
+				return true
+			}
+
+			doubles = true
+		}
+	}
 
 	return false
 }
