@@ -1,5 +1,7 @@
 package helpers
 
+import "sort"
+
 // Permutations generates all possible combinations from the input data
 func Permutations(xs []int16) (permuts [][]int16) {
 	// Taken from: https://www.golangprograms.com/golang-program-to-generate-slice-permutations-of-number-entered-by-user.html
@@ -67,4 +69,20 @@ func Copy2dInt(array [][]int) (copied [][]int) {
 	}
 
 	return
+}
+
+// RemoveItemsAtIndexes takes an array of data and an array of indexes, loops
+// through the array to remove those indexes, in a safe way, and returns the
+// remaining elements
+// TODO convert to a generic in the future with an applicable golang version
+func RemoveItemsAtIndexes(array []string, indexesForRemoval []int) []string {
+	// Sorting in reverse means the removals doesn't change the indexes for other removals
+	sort.Sort(sort.Reverse(sort.IntSlice(indexesForRemoval)))
+
+	// Go through all the indexes to remove and remove them from the array
+	for _, i := range indexesForRemoval {
+		array = append(array[0:i], array[i+1:]...)
+	}
+
+	return array
 }
