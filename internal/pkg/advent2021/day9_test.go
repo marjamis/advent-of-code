@@ -47,13 +47,15 @@ func TestFindBasinSize(t *testing.T) {
 				"101",
 				"234",
 			},
-			7,
+			8,
 		},
 	}
 
 	for _, test := range tests {
 		heightMap := createHeightMap(test.input)
-		assert.Equal(t, test.expected, heightMap.findBasinSize(1, 1))
+
+		basinSize, _ := heightMap.findBasinSize([]point{}, 1, 1)
+		assert.Equal(t, test.expected, basinSize)
 	}
 }
 

@@ -5,8 +5,6 @@ import (
 	"log"
 	"sort"
 	"strconv"
-
-	"github.com/marjamis/advent-of-code/pkg/helpers"
 )
 
 type heights [][]int
@@ -82,37 +80,48 @@ func (hm heights) isPartOfBasin(row, col, height int) bool {
 		return false
 	}
 
-	difference := helpers.Abs(hm[row][col] - height)
-	if difference == 0 || difference == 1 {
+	if hm[row][col] >= (height+1) && hm[row][col] != 9 {
 		return true
 	}
 
 	return false
 }
 
-func (hm heights) findBasinSize(row, col int) (size int) {
-	validPoints := []point{}
+func isAlreadyCountedInBasin(existingBasin []point, row, col int) bool {
+	for _, exist := range existingBasin {
+		if exist.row == row && exist.col == col {
+			return true
+		}
+	}
+
+	return false
+}
+
+func (hm heights) findBasinSize(existingBasin []point, row, col int) (size int, newBasin []point) {
 	currentHeight := hm[row][col]
-
-	if hm.isPartOfBasin(row-1, col, currentHeight) {
-		validPoints = append(validPoints, point{row - 1, col, 0})
-	}
-	if hm.isPartOfBasin(row+1, col, currentHeight) {
-		validPoints = append(validPoints, point{row + 1, col, 0})
-	}
-	if hm.isPartOfBasin(row, col-1, currentHeight) {
-		validPoints = append(validPoints, point{row, col - 1, 0})
-	}
-	if hm.isPartOfBasin(row, col+1, currentHeight) {
-		validPoints = append(validPoints, point{row, col + 1, 0})
+	surroundingPoints := []struct {
+		row int
+		col int
+	}{
+		{row: row - 1, col: col},
+		{row: row + 1, col: col},
+		{row: row, col: col - 1},
+		{row: row, col: col + 1},
 	}
 
-	subs := 0
-	for _, p := range validPoints {
-		subs += hm.findBasinSize(p.row, p.col)
+	existingBasin = append(existingBasin, point{row, col, 0})
+	size++
+
+	for _, surroundingPoint := range surroundingPoints {
+		if hm.isPartOfBasin(surroundingPoint.row, surroundingPoint.col, currentHeight) &&
+			!isAlreadyCountedInBasin(existingBasin, surroundingPoint.row, surroundingPoint.col) {
+			var ns int
+			ns, existingBasin = hm.findBasinSize(existingBasin, surroundingPoint.row, surroundingPoint.col)
+			size += ns
+		}
 	}
 
-	return len(validPoints) + subs
+	return size, existingBasin
 }
 
 // Day9Part1 returns the risk level based on the low points
@@ -127,14 +136,15 @@ func Day9Part1(heightMapInput []string) (riskLevel int) {
 	return
 }
 
-// Day9Part2 returns the risk based on all the basins sizes
+// Day9Part2 returns the risk based on all the three largest basins sizes
 func Day9Part2(heightMapInput []string) (riskLevel int) {
 	heightMap := createHeightMap(heightMapInput)
 
 	basinSizes := []int{}
 	lowPoints := heightMap.findLowPoints()
 	for _, height := range lowPoints {
-		basinSizes = append(basinSizes, heightMap.findBasinSize(height.row, height.col))
+		basinSize, _ := heightMap.findBasinSize([]point{}, height.row, height.col)
+		basinSizes = append(basinSizes, basinSize)
 	}
 
 	sort.Sort(sort.Reverse(sort.IntSlice(basinSizes)))
