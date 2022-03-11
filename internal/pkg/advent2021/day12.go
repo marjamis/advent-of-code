@@ -32,9 +32,27 @@ func filterSmallCavesFromPath(pathSoFar []string, currentCave string) bool {
 		return false
 	}
 
-	for _, path := range pathSoFar {
-		if strings.Compare(currentCave, path) == 0 {
+	for _, cave := range pathSoFar {
+		if strings.Compare(currentCave, cave) == 0 {
 			return true
+		}
+	}
+
+	return false
+}
+
+func hasSmallCaveDoubleVisit(pathSoFar []string) bool {
+	caveVisits := map[string]int{}
+	for _, cave := range pathSoFar {
+		// Only applies to small caves (hence lower case)
+		if cave == strings.ToLower(cave) {
+			_, ok := caveVisits[cave]
+			if !ok {
+				caveVisits[cave] = 1
+			} else {
+				// If the key is found this means its already been visited and there is a double visit
+				return true
+			}
 		}
 	}
 
@@ -47,55 +65,37 @@ func filterUpdatedSmallCavesFromPath(pathSoFar []string, currentCave string) boo
 		return false
 	}
 
-	// Allow one small cave to have two visits but all others one. Filter any that try for a second
-	// First count all the small caves that exist
-	counts := map[string]int{}
-	for _, p := range pathSoFar {
-		if p == strings.ToLower(p) {
-			_, ok := counts[p]
-			if !ok {
-				counts[p] = 1
-			} else {
-				counts[p]++
-			}
-		}
-	}
+	// Find if there are already any double visits for small caves
+	doubles := hasSmallCaveDoubleVisit(pathSoFar)
 
-	// Check if the one double is already taken
-	doubles := false
-	for _, c := range counts {
-		if c > 1 {
-			doubles = true
-		}
-	}
-
-	// Now loop through the path for the currentCave and if no doubles is found
-	// then it's still valid but if a double is already used it's not a valid path
-	for _, path := range pathSoFar {
-		if strings.Compare(currentCave, path) == 0 {
-			if doubles {
+	// If there is a double already then this cave needs checking if it would also be a double visit
+	// if there aren't any doubles then this currentCave is valid already
+	// can be visited without further checks
+	if doubles {
+		// Loops through the path for the currentCave and if a match is found this means its a invalid
+		// path as it will be a second double
+		for _, cave := range pathSoFar {
+			if strings.Compare(currentCave, cave) == 0 {
 				return true
 			}
-
-			doubles = true
 		}
 	}
 
 	return false
 }
 
-func cavesToVisit(filters Filters, caves Caves, pathSoFar []string) (validNextCaves []string) {
+func cavesToVisit(caves Caves, filters Filters, pathSoFar []string) (validNextCaves []string) {
 	// Get a list of all the current caves (last element in pathSoFar) connections
 	// for the beginnings of next cave to explore
-	for _, i := range caves[pathSoFar[len(pathSoFar)-1]].Edges {
-		validNextCaves = append(validNextCaves, i.Destination.Name)
+	for _, edge := range caves[pathSoFar[len(pathSoFar)-1]].Edges {
+		validNextCaves = append(validNextCaves, edge.Destination.Name)
 	}
 
 	// Exclude the start cave, if it's a possibility
 	// TODO make it a filter
 	remove := []int{}
-	for i, possibility := range validNextCaves {
-		if filters.start(possibility) {
+	for i, nextCave := range validNextCaves {
+		if filters.start(nextCave) {
 			remove = append(remove, i)
 		}
 	}
@@ -104,8 +104,8 @@ func cavesToVisit(filters Filters, caves Caves, pathSoFar []string) (validNextCa
 	// Filter out small caves that are already visited, i.e. already in the pathSoFar
 	// TODO make it a filter
 	remove = []int{}
-	for i, possibility := range validNextCaves {
-		if filters.smallCaves(pathSoFar, possibility) {
+	for i, nextCave := range validNextCaves {
+		if filters.smallCaves(pathSoFar, nextCave) {
 			remove = append(remove, i)
 		}
 	}
@@ -114,7 +114,7 @@ func cavesToVisit(filters Filters, caves Caves, pathSoFar []string) (validNextCa
 	return validNextCaves
 }
 
-func traverse(caves Caves, nextCave string, pathSoFar []string, filters Filters) (totalPaths int) {
+func traverse(caves Caves, filters Filters, nextCave string, pathSoFar []string) (totalPaths int) {
 	pathSoFar = append(pathSoFar, nextCave)
 	if nextCave == "end" {
 		// If this next cave is the end then it's a valid path to end on
@@ -122,8 +122,8 @@ func traverse(caves Caves, nextCave string, pathSoFar []string, filters Filters)
 	} else {
 		// Find all caves that can be visited and then continually traverse these until they fail
 		// or they find the end cave
-		for _, caveToVisit := range cavesToVisit(filters, caves, pathSoFar) {
-			totalPaths += traverse(caves, caveToVisit, pathSoFar, filters)
+		for _, caveToVisit := range cavesToVisit(caves, filters, pathSoFar) {
+			totalPaths += traverse(caves, filters, caveToVisit, pathSoFar)
 		}
 	}
 
@@ -134,18 +134,18 @@ func traverse(caves Caves, nextCave string, pathSoFar []string, filters Filters)
 func Day12Part1(rawData []string) int {
 	caves := Caves(helpers.LoadNodes(rawData, "-"))
 
-	return traverse(caves, "start", []string{}, Filters{
+	return traverse(caves, Filters{
 		start:      filterStart,
 		smallCaves: filterSmallCavesFromPath,
-	})
+	}, "start", []string{})
 }
 
 // Day12Part2 returns the number of paths from the start to the end based on the updated rules
 func Day12Part2(rawData []string) int {
 	caves := Caves(helpers.LoadNodes(rawData, "-"))
 
-	return traverse(caves, "start", []string{}, Filters{
+	return traverse(caves, Filters{
 		start:      filterStart,
 		smallCaves: filterUpdatedSmallCavesFromPath,
-	})
+	}, "start", []string{})
 }

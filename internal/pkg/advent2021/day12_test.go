@@ -24,6 +24,12 @@ func TestFilterUpdatedSmallCavesFromPath(t *testing.T) {
 		"start", "A", "c", "A", "c", "A", "b", "A"}, "b"))
 }
 
+func TestHasSmallCaveDoubleVisit(t *testing.T) {
+	assert.False(t, hasSmallCaveDoubleVisit([]string{"A", "c"}))
+	assert.True(t, hasSmallCaveDoubleVisit([]string{"A", "c", "c"}))
+	assert.False(t, hasSmallCaveDoubleVisit([]string{"A", "A", "A"}))
+}
+
 func TestCavesToVisitP1(t *testing.T) {
 	testCaves := Caves(helpers.LoadNodes(
 		[]string{
@@ -37,24 +43,24 @@ func TestCavesToVisitP1(t *testing.T) {
 		},
 		"-"))
 
-	assert.ElementsMatch(t, []string{"c", "end"}, cavesToVisit(Filters{
+	assert.ElementsMatch(t, []string{"c", "end"}, cavesToVisit(testCaves, Filters{
 		start:      filterStart,
 		smallCaves: filterSmallCavesFromPath,
-	}, testCaves, []string{
+	}, []string{
 		"start", "A", "b", "A",
 	}))
 
-	assert.ElementsMatch(t, []string{"A"}, cavesToVisit(Filters{
+	assert.ElementsMatch(t, []string{"A"}, cavesToVisit(testCaves, Filters{
 		start:      filterStart,
 		smallCaves: filterSmallCavesFromPath,
-	}, testCaves, []string{
+	}, []string{
 		"start", "A", "b", "A", "c",
 	}))
 
-	assert.ElementsMatch(t, []string{"end"}, cavesToVisit(Filters{
+	assert.ElementsMatch(t, []string{"end"}, cavesToVisit(testCaves, Filters{
 		start:      filterStart,
 		smallCaves: filterSmallCavesFromPath,
-	}, testCaves, []string{
+	}, []string{
 		"start", "A", "b", "A", "c", "A",
 	}))
 }
@@ -124,10 +130,10 @@ func TestTraverseP1(t *testing.T) {
 	}
 
 	for _, test := range tests {
-		assert.Equal(t, test.expected, traverse(test.input, "start", []string{}, Filters{
+		assert.Equal(t, test.expected, traverse(test.input, Filters{
 			start:      filterStart,
 			smallCaves: filterSmallCavesFromPath,
-		}))
+		}, "start", []string{}))
 	}
 }
 
@@ -196,9 +202,9 @@ func TestTraverseP2(t *testing.T) {
 	}
 
 	for _, test := range tests {
-		assert.Equal(t, test.expected, traverse(test.input, "start", []string{}, Filters{
+		assert.Equal(t, test.expected, traverse(test.input, Filters{
 			start:      filterStart,
 			smallCaves: filterUpdatedSmallCavesFromPath,
-		}))
+		}, "start", []string{}))
 	}
 }
