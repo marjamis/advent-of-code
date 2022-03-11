@@ -66,7 +66,7 @@ var days2021 = map[string]day{
 		Function: func() {
 			input := helpers.ReadStringArray(dataDirectory2021 + "day9.txt")
 			fmt.Println(advent2021.Day9Part1(input))
-			// fmt.Println(advent2021.Day8Part2(input))
+			fmt.Println(advent2021.Day9Part2(input))
 		}},
 	"10": {
 		Function: func() {
