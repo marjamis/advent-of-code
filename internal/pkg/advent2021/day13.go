@@ -96,7 +96,7 @@ func (paper Paper) foldOnVerticalLine(foldAtLine int) Paper {
 	newPaper := createBlankPaper(foldAtLine, len(paper))
 
 	for row := 0; row < len(paper); row++ {
-		for inner, outer := 0, len(paper[0])-1; inner < foldAtLine; inner, outer = inner+1, outer-1 {
+		for inner, outer := 0, len(paper[row])-1; inner < foldAtLine; inner, outer = inner+1, outer-1 {
 			if paper[row][inner] == "#" || paper[row][outer] == "#" {
 				newPaper[row][inner] = "#"
 			}
@@ -151,11 +151,16 @@ func (paper Paper) print() {
 	}
 	fmt.Println()
 }
+
 func (paper Paper) sprintf() string {
 	formatted := ""
 	for _, row := range paper {
 		for _, col := range row {
-			formatted += fmt.Sprintf(col)
+			if col == "." {
+				formatted += fmt.Sprintf(" ")
+			} else {
+				formatted += fmt.Sprintf(col)
+			}
 		}
 		formatted += "\n"
 	}
