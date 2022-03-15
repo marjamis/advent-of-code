@@ -194,6 +194,45 @@ func (points paperPoints) loadPaperPoints(colSize, rowSize int) Paper {
 	return paper
 }
 
+func calculatedPaper(instructions []string, coordinates []string) Paper {
+	coords := paperPoints(getCoordinates(coordinates))
+	colSize, rowSize := getPaperSize(coords)
+	for _, instruction := range instructions {
+		lineString := strings.Split(instruction, "=")[1]
+		line, err := strconv.Atoi(lineString)
+		if err != nil {
+			log.Fatal(err)
+		}
+		if strings.Contains(instruction, "x") {
+			for i, coordinate := range coords {
+				if coordinate.col > line {
+					coords[i].col = colSize - coordinate.col - 1
+				} else if coordinate.col == line {
+					coords[i].col = 0
+					coords[i].row = 0
+				}
+			}
+
+			colSize = (colSize) / 2
+		} else {
+			for i, coordinate := range coords {
+				if coordinate.row > line {
+					coords[i].row = rowSize - coordinate.row - 1
+				} else if coordinate.row == line {
+					coords[i].row = 0
+					coords[i].col = 0
+				}
+			}
+
+			rowSize = (rowSize) / 2
+		}
+	}
+
+	paper := coords.loadPaperPoints(colSize, rowSize)
+
+	return paper
+}
+
 // Day13Part1Simulated returns the simulated version for the number of dots visible after the first fold
 func Day13Part1Simulated(rawData []string) int {
 	instructions, coordinates := splitCoordinatesAndInstructions(rawData)
@@ -234,43 +273,4 @@ func Day13Part2Calculated(rawData []string) string {
 	paper := calculatedPaper(instructions, coordinates)
 
 	return paper.sprintf()
-}
-
-func calculatedPaper(instructions []string, coordinates []string) Paper {
-	coords := paperPoints(getCoordinates(coordinates))
-	colSize, rowSize := getPaperSize(coords)
-	for _, instruction := range instructions {
-		lineString := strings.Split(instruction, "=")[1]
-		line, err := strconv.Atoi(lineString)
-		if err != nil {
-			log.Fatal(err)
-		}
-		if strings.Contains(instruction, "x") {
-			for i, coordinate := range coords {
-				if coordinate.col > line {
-					coords[i].col = colSize - coordinate.col - 1
-				} else if coordinate.col == line {
-					coords[i].col = 0
-					coords[i].row = 0
-				}
-			}
-
-			colSize = (colSize) / 2
-		} else {
-			for i, coordinate := range coords {
-				if coordinate.row > line {
-					coords[i].row = rowSize - coordinate.row - 1
-				} else if coordinate.row == line {
-					coords[i].row = 0
-					coords[i].col = 0
-				}
-			}
-
-			rowSize = (rowSize) / 2
-		}
-	}
-
-	paper := coords.loadPaperPoints(colSize, rowSize)
-
-	return paper
 }
