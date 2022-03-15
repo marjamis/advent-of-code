@@ -41,12 +41,12 @@ func getCoordinates(coordinates []string) []paperPoint {
 
 func getPaperSize(paperPoints []paperPoint) (colSize, rowSize int) {
 	for _, paperPoint := range paperPoints {
-		if paperPoint.col > rowSize {
-			rowSize = paperPoint.col
+		if paperPoint.col > colSize {
+			colSize = paperPoint.col
 		}
 
-		if paperPoint.row > colSize {
-			colSize = paperPoint.row
+		if paperPoint.row > rowSize {
+			rowSize = paperPoint.row
 		}
 	}
 
@@ -68,7 +68,7 @@ func createBlankPaper(colSize, rowSize int) Paper {
 
 func loadPaper(stringCoordinates []string) Paper {
 	coordinates := getCoordinates(stringCoordinates)
-	rowSize, colSize := getPaperSize(coordinates)
+	colSize, rowSize := getPaperSize(coordinates)
 	paper := createBlankPaper(colSize, rowSize)
 
 	for _, coordinate := range coordinates {
@@ -80,6 +80,12 @@ func loadPaper(stringCoordinates []string) Paper {
 
 func (paper Paper) foldOnHorizontalLine(foldAtLine int) Paper {
 	newPaper := createBlankPaper(len(paper[0]), foldAtLine)
+
+	for _, col := range paper[foldAtLine] {
+		if col == "#" {
+			log.Fatal(fmt.Sprintf("Horizontal fold at line issue: %d\n", foldAtLine))
+		}
+	}
 
 	for inner, outer := 0, len(paper)-1; inner < foldAtLine; inner, outer = inner+1, outer-1 {
 		for col := 0; col < len(paper[0]); col++ {
@@ -94,6 +100,12 @@ func (paper Paper) foldOnHorizontalLine(foldAtLine int) Paper {
 
 func (paper Paper) foldOnVerticalLine(foldAtLine int) Paper {
 	newPaper := createBlankPaper(foldAtLine, len(paper))
+
+	for row := range paper {
+		if paper[row][foldAtLine] == "#" {
+			log.Fatal(fmt.Sprintf("Vertical fold at line issue: %d", foldAtLine))
+		}
+	}
 
 	for row := 0; row < len(paper); row++ {
 		for inner, outer := 0, len(paper[row])-1; inner < foldAtLine; inner, outer = inner+1, outer-1 {

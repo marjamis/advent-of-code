@@ -48,8 +48,8 @@ func TestGetPaperSize(t *testing.T) {
 				{col: 0, row: 3},
 				{col: 10, row: 4},
 			},
-			15,
 			11,
+			15,
 		},
 	}
 
@@ -181,6 +181,7 @@ func TestFold(t *testing.T) {
 	t.Run("Fold on the horizontal line", func(t *testing.T) {
 		data := Paper{
 			{".", "#", "#", "."},
+			{".", ".", ".", "."},
 			{".", "#", ".", "#"},
 		}
 		expected := [][]string{
@@ -193,6 +194,7 @@ func TestFold(t *testing.T) {
 		data := Paper{
 			{".", "#", "#", "."},
 			{".", ".", ".", "#"},
+			{".", ".", ".", "."},
 			{"#", ".", "#", "."},
 			{".", "#", ".", "."},
 		}
@@ -205,10 +207,10 @@ func TestFold(t *testing.T) {
 
 	t.Run("Fold on the vertical line", func(t *testing.T) {
 		data := Paper{
-			{".", "."},
-			{"#", "#"},
-			{".", "#"},
-			{"#", "."},
+			{".", ".", "."},
+			{"#", ".", "#"},
+			{".", ".", "#"},
+			{"#", ".", "."},
 		}
 		expected := [][]string{
 			{"."},
@@ -221,10 +223,10 @@ func TestFold(t *testing.T) {
 
 	t.Run("Extended fold on the vertical line", func(t *testing.T) {
 		data := Paper{
-			{".", ".", "#", "."},
-			{".", "#", ".", "#"},
-			{"#", ".", "#", "."},
-			{".", ".", ".", "#"},
+			{".", ".", ".", "#", "."},
+			{".", "#", ".", ".", "#"},
+			{"#", ".", ".", "#", "."},
+			{".", ".", ".", ".", "#"},
 		}
 		expected := [][]string{
 			{".", "#"},
