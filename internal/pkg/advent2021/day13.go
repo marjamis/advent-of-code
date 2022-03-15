@@ -12,6 +12,8 @@ type paperPoint struct {
 	row, col int
 }
 
+type paperPoints []paperPoint
+
 // Paper is the representation of the paper after each fold
 type Paper [][]string
 
@@ -142,6 +144,7 @@ func (paper Paper) fold(instruction string) Paper {
 	} else {
 		paper = paper.foldOnHorizontalLine(line)
 	}
+
 	return paper
 }
 
@@ -181,8 +184,18 @@ func (paper Paper) sprintf() string {
 	return formatted
 }
 
-// Day13Part1 returns the number of dots visible after the first fold
-func Day13Part1(rawData []string) int {
+func (points paperPoints) loadPaperPoints(colSize, rowSize int) Paper {
+	paper := createBlankPaper(colSize, rowSize)
+
+	for _, coordinate := range points {
+		paper[coordinate.row][coordinate.col] = "#"
+	}
+
+	return paper
+}
+
+// Day13Part1Simulated returns the simulated version for the number of dots visible after the first fold
+func Day13Part1Simulated(rawData []string) int {
 	instructions, coordinates := splitCoordinatesAndInstructions(rawData)
 
 	paper := loadPaper(coordinates)
@@ -191,18 +204,73 @@ func Day13Part1(rawData []string) int {
 	return paper.countDots()
 }
 
-// Day13Part2 displays the 8 letters (in ASCII picture format) which is the code for the thermal camera
-func Day13Part2(rawData []string) string {
+// Day13Part1Calculated returns the calculated version for the number of dots visible after the first fold
+func Day13Part1Calculated(rawData []string) int {
+	instructions, coordinates := splitCoordinatesAndInstructions(rawData)
+
+	paper := calculatedPaper([]string{
+		instructions[0],
+	}, coordinates)
+
+	return paper.countDots()
+}
+
+// Day13Part2Simulated displays the simulated version of the 8 letters (in ASCII picture format) which is the code for the thermal camera
+func Day13Part2Simulated(rawData []string) string {
 	instructions, coordinates := splitCoordinatesAndInstructions(rawData)
 
 	paper := loadPaper(coordinates)
-
 	for _, instruction := range instructions {
 		paper = paper.fold(instruction)
-		if log.GetLevel() == log.DebugLevel {
-			paper.print()
-		}
 	}
 
 	return paper.sprintf()
+}
+
+// Day13Part2Calculated displays the calculated version of the 8 letters (in ASCII picture format) which is the code for the thermal camera
+func Day13Part2Calculated(rawData []string) string {
+	instructions, coordinates := splitCoordinatesAndInstructions(rawData)
+
+	paper := calculatedPaper(instructions, coordinates)
+
+	return paper.sprintf()
+}
+
+func calculatedPaper(instructions []string, coordinates []string) Paper {
+	coords := paperPoints(getCoordinates(coordinates))
+	colSize, rowSize := getPaperSize(coords)
+	for _, instruction := range instructions {
+		lineString := strings.Split(instruction, "=")[1]
+		line, err := strconv.Atoi(lineString)
+		if err != nil {
+			log.Fatal(err)
+		}
+		if strings.Contains(instruction, "x") {
+			for i, coordinate := range coords {
+				if coordinate.col > line {
+					coords[i].col = colSize - coordinate.col - 1
+				} else if coordinate.col == line {
+					coords[i].col = 0
+					coords[i].row = 0
+				}
+			}
+
+			colSize = (colSize) / 2
+		} else {
+			for i, coordinate := range coords {
+				if coordinate.row > line {
+					coords[i].row = rowSize - coordinate.row - 1
+				} else if coordinate.row == line {
+					coords[i].row = 0
+					coords[i].col = 0
+				}
+			}
+
+			rowSize = (rowSize) / 2
+		}
+	}
+
+	paper := coords.loadPaperPoints(colSize, rowSize)
+
+	return paper
 }

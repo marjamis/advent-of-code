@@ -236,42 +236,44 @@ func TestFold(t *testing.T) {
 		}
 		assert.ElementsMatch(t, expected, data.foldOnVerticalLine(2))
 	})
+}
 
-	t.Run("Provided example with both a vertical and horizontal fold", func(t *testing.T) {
-		data := []string{
-			"6,10",
-			"0,14",
-			"9,10",
-			"0,3",
-			"10,4",
-			"4,11",
-			"6,0",
-			"6,12",
-			"4,1",
-			"0,13",
-			"10,12",
-			"3,4",
-			"3,0",
-			"8,4",
-			"1,10",
-			"2,14",
-			"8,10",
-			"9,0",
-			"",
-			"fold along y=7",
-			"fold along x=5",
-		}
-		expected := Paper{
-			{"#", "#", "#", "#", "#"},
-			{"#", ".", ".", ".", "#"},
-			{"#", ".", ".", ".", "#"},
-			{"#", ".", ".", ".", "#"},
-			{"#", "#", "#", "#", "#"},
-			{".", ".", ".", ".", "."},
-			{".", ".", ".", ".", "."},
-		}
+func TestProvidedExample(t *testing.T) {
+	data := []string{
+		"6,10",
+		"0,14",
+		"9,10",
+		"0,3",
+		"10,4",
+		"4,11",
+		"6,0",
+		"6,12",
+		"4,1",
+		"0,13",
+		"10,12",
+		"3,4",
+		"3,0",
+		"8,4",
+		"1,10",
+		"2,14",
+		"8,10",
+		"9,0",
+		"",
+		"fold along y=7",
+		"fold along x=5",
+	}
+	expected := Paper{
+		{"#", "#", "#", "#", "#"},
+		{"#", ".", ".", ".", "#"},
+		{"#", ".", ".", ".", "#"},
+		{"#", ".", ".", ".", "#"},
+		{"#", "#", "#", "#", "#"},
+		{".", ".", ".", ".", "."},
+		{".", ".", ".", ".", "."},
+	}
+
+	t.Run("Simulated", func(t *testing.T) {
 		instructions, coordinates := splitCoordinatesAndInstructions(data)
-
 		paper := loadPaper(coordinates)
 
 		for _, instruction := range instructions {
@@ -279,5 +281,12 @@ func TestFold(t *testing.T) {
 		}
 
 		assert.ElementsMatch(t, expected, paper)
+	})
+
+	t.Run("Calculated", func(t *testing.T) {
+		instructions, coordinates := splitCoordinatesAndInstructions(data)
+		finalCoordinates := calculatedPaper(instructions, coordinates)
+
+		assert.ElementsMatch(t, expected, finalCoordinates)
 	})
 }
