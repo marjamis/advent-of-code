@@ -157,7 +157,7 @@ func (oem OctopusEnergyMap) isSynchonised() bool {
 // Day11Part1 returns the number of flashes from the dumbo octopuses
 func Day11Part1(initialEnergyLevels [][]int) (numberOfFlashes int) {
 	// Creates a copy of the array to ensure its not changing the original data
-	oem := OctopusEnergyMap(helpers.Copy2dInt(initialEnergyLevels))
+	oem := OctopusEnergyMap(helpers.Copy2dArray(initialEnergyLevels))
 
 	for i := 0; i < 100; i++ {
 		numberOfFlashes += oem.step()
@@ -169,7 +169,7 @@ func Day11Part1(initialEnergyLevels [][]int) (numberOfFlashes int) {
 // Day11Part2 returns the first step in which all dumbo octopuses flash at the same time
 func Day11Part2(initialEnergyLevels [][]int) (synchronisedFlashStep int) {
 	// Creates a copy of the array to ensure its not changing the original data
-	oem := OctopusEnergyMap(helpers.Copy2dInt(initialEnergyLevels))
+	oem := OctopusEnergyMap(helpers.Copy2dArray(initialEnergyLevels))
 
 	// Starting a 1 as there isn't a step 0 in this calculation
 	for synchronisedFlashStep = 1; ; synchronisedFlashStep++ {
