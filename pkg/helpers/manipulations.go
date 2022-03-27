@@ -2,6 +2,10 @@ package helpers
 
 import "sort"
 
+type ArrayTypes interface {
+	int | int32 | int64 | float32 | float64 | ~string
+}
+
 // Permutations generates all possible combinations from the input data
 func Permutations(xs []int16) (permuts [][]int16) {
 	// Taken from: https://www.golangprograms.com/golang-program-to-generate-slice-permutations-of-number-entered-by-user.html
@@ -23,8 +27,7 @@ func Permutations(xs []int16) (permuts [][]int16) {
 }
 
 // IsLocationValid returns if the provided x,y coordinates are within the range of the provided 2d array.
-func IsLocationValid(arr [][]rune, x, y int) bool {
-	//TODO change this to be a generic 2d array rather than rune specifically
+func IsLocationValid[T ArrayTypes](arr [][]T, x, y int) bool {
 	return (x >= 0) && (x < len(arr[0])) && (y >= 0) && (y < len(arr))
 }
 
@@ -59,11 +62,10 @@ func DecimalPositionOf(desiredPosition int) (positionValue int) {
 	return
 }
 
-// Copy2dInt creates a copy of a 2d array
-// TODO convert to a generic in the future with an applicable golang version
-func Copy2dInt(array [][]int) (copied [][]int) {
+// Copy2dArray creates a copy of a 2d array
+func Copy2dArray[T ArrayTypes](array [][]T) (copied [][]T) {
 	for _, i := range array {
-		tmp := make([]int, len(i))
+		tmp := make([]T, len(i))
 		copy(tmp, i)
 		copied = append(copied, tmp)
 	}
@@ -74,8 +76,7 @@ func Copy2dInt(array [][]int) (copied [][]int) {
 // RemoveItemsAtIndexes takes an array of data and an array of indexes, loops
 // through the array to remove those indexes, in a safe way, and returns the
 // remaining elements
-// TODO convert to a generic in the future with an applicable golang version
-func RemoveItemsAtIndexes(array []string, indexesForRemoval []int) []string {
+func RemoveItemsAtIndexes[T ArrayTypes](array []T, indexesForRemoval []int) []T {
 	// Sorting in reverse means the removals doesn't change the indexes for other removals
 	sort.Sort(sort.Reverse(sort.IntSlice(indexesForRemoval)))
 
