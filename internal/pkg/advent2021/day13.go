@@ -194,20 +194,33 @@ func (points paperPoints) loadPaperPoints(colSize, rowSize int) Paper {
 	return paper
 }
 
+func positionAfterFold(index, foldAtLine, maxIndex int) int {
+	if index < foldAtLine {
+		return index
+	}
+
+	if index == foldAtLine {
+		return -1
+	}
+
+	return maxIndex - index
+}
+
 func calculatedPaper(instructions []string, coordinates []string) Paper {
 	coords := paperPoints(getCoordinates(coordinates))
 	colSize, rowSize := getPaperSize(coords)
+
 	for _, instruction := range instructions {
 		lineString := strings.Split(instruction, "=")[1]
-		line, err := strconv.Atoi(lineString)
+		foldAtLine, err := strconv.Atoi(lineString)
 		if err != nil {
 			log.Fatal(err)
 		}
+
 		if strings.Contains(instruction, "x") {
-			for i, coordinate := range coords {
-				if coordinate.col > line {
-					coords[i].col = colSize - coordinate.col - 1
-				} else if coordinate.col == line {
+			for i := range coords {
+				coords[i].col = positionAfterFold(coords[i].col, foldAtLine, colSize-1)
+				if coords[i].col == -1 {
 					coords[i].col = 0
 					coords[i].row = 0
 				}
@@ -215,10 +228,9 @@ func calculatedPaper(instructions []string, coordinates []string) Paper {
 
 			colSize = (colSize) / 2
 		} else {
-			for i, coordinate := range coords {
-				if coordinate.row > line {
-					coords[i].row = rowSize - coordinate.row - 1
-				} else if coordinate.row == line {
+			for i := range coords {
+				coords[i].row = positionAfterFold(coords[i].row, foldAtLine, rowSize-1)
+				if coords[i].row == -1 {
 					coords[i].row = 0
 					coords[i].col = 0
 				}

@@ -177,6 +177,24 @@ func TestLoadPaper(t *testing.T) {
 	assert.ElementsMatch(t, expected, loadPaper(data))
 }
 
+func TestPositionAfterFold(t *testing.T) {
+	tests := []struct {
+		index      int
+		foldAtLine int
+		maxIndex   int
+		expected   int
+	}{
+		{0, 1, 2, 0},
+		{1, 1, 2, -1},
+		{2, 1, 2, 0},
+		{10, 7, 14, 4},
+	}
+
+	for _, test := range tests {
+		assert.Equal(t, test.expected, positionAfterFold(test.index, test.foldAtLine, test.maxIndex))
+	}
+}
+
 func TestFold(t *testing.T) {
 	t.Run("Fold on the horizontal line", func(t *testing.T) {
 		data := Paper{
