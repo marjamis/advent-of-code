@@ -1213,9 +1213,12 @@ func Day14(data string) (sum int) {
 				}
 				memory[addition[1]] = new
 			}
-			n, _ := strconv.ParseInt(addition[2], 0, 64)
+			n, err := strconv.Atoi(addition[2])
+			if err != nil {
+				log.Fatal(err)
+			}
 
-			memory[addition[1]] = day14ApplyMask(day14ConvertToBinary(int(n)), mask)
+			memory[addition[1]] = day14ApplyMask(day14ConvertToBinary(n), mask)
 		}
 	}
 
@@ -1828,12 +1831,14 @@ func Day16Part2(ticketData string) (errorRate int64) {
 
 func calculateGroup(expression string) (result int) {
 	operations := strings.Split(expression, " ")
-	t, _ := strconv.ParseInt(operations[0], 0, 64)
-	result = int(t)
+	result, err := strconv.Atoi(operations[0])
+	if err != nil {
+		log.Fatal(err)
+	}
+
 	nextOp := ""
 	for _, operation := range operations {
-		val, err := strconv.ParseInt(operation, 0, 64)
-		num := int(val)
+		num, err := strconv.Atoi(operation)
 		if err == nil && nextOp != "" {
 			// log.Debugf("Results: %d using operation: %s with currentNumber: %d", result, nextOp, vali)
 			switch nextOp {
@@ -1886,15 +1891,23 @@ func calculateGroupAdvanced(expression string) (result int) {
 	log.Infof("Initial expression: %s", initial)
 	for strings.Contains(expression, " + ") {
 		operations := strings.Split(expression, " ")
-		t, _ := strconv.ParseInt(operations[0], 0, 64)
-		result = int(t)
+		var err error
+		result, err = strconv.Atoi(operations[0])
+		if err != nil {
+			log.Fatal(err)
+		}
+
 		nextOp := ""
 		for i, operation := range operations {
-			val, err := strconv.ParseInt(operation, 0, 64)
+			val, err := strconv.Atoi(operation)
 			if err == nil && nextOp == "+" {
 				// log.Debugf("Results: %d using operation: %s with currentNumber: %d", result, nextOp, vali)
 				vali := int(val)
-				prev, _ := strconv.ParseInt(operations[i-2], 0, 64)
+				prev, err := strconv.Atoi(operations[i-2])
+				if err != nil {
+					log.Fatal(err)
+				}
+
 				previ := int(prev)
 				rep := operations[i-2] + " + " + operation
 				pv := strconv.Itoa(previ + vali)
@@ -1909,14 +1922,16 @@ func calculateGroupAdvanced(expression string) (result int) {
 	log.Infof("After +'s expression: %s", expression)
 
 	operations := strings.Split(expression, " ")
-	t, _ := strconv.ParseInt(operations[0], 0, 64)
-	result = int(t)
+	var err error
+	result, err = strconv.Atoi(operations[0])
+	if err != nil {
+		log.Fatal(err)
+	}
 	nextOp := ""
 	for _, operation := range operations {
-		val, err := strconv.ParseInt(operation, 0, 64)
+		val, err := strconv.Atoi(operation)
 		if err == nil && nextOp == "*" {
-			vali := int(val)
-			result *= vali
+			result *= val
 		} else {
 			nextOp = operation
 		}
@@ -2519,8 +2534,11 @@ func Day22(data string, recursive bool) int {
 func Day23(cupOrder string, moves int) (finalOrder string) {
 	order := make([]int, len(cupOrder))
 	for index, cup := range cupOrder {
-		nn, _ := strconv.ParseInt(string(cup), 0, 64)
-		order[index] = int(nn)
+		nn, err := strconv.Atoi(string(cup))
+		if err != nil {
+			log.Fatal(err)
+		}
+		order[index] = nn
 	}
 
 	if moves == 10000000 {
