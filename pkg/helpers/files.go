@@ -146,21 +146,6 @@ func ReadStringCSV(file string) (strings [][]string) {
 	return
 }
 
-// RemoveDuplicates takes a []string array and removes any duplicates strings in that array
-func RemoveDuplicates(data []string) (uniques []string) {
-	present := map[string]bool{}
-
-	for _, d := range data {
-		_, ok := present[d]
-		if !ok {
-			uniques = append(uniques, d)
-			present[d] = true
-		}
-	}
-
-	return uniques
-}
-
 // ReadIntArray2d reads from file and returns a [][]int
 func ReadIntArray2d(file string) (ints [][]int) {
 	fdata, _ := os.Open(file)

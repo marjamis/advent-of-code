@@ -87,3 +87,18 @@ func RemoveItemsAtIndexes[T ArrayTypes](array []T, indexesForRemoval []int) []T 
 
 	return array
 }
+
+// RemoveDuplicates takes a []string array and removes any duplicates strings in that array
+func RemoveDuplicates(data []string) (uniques []string) {
+	present := map[string]bool{}
+
+	for _, d := range data {
+		_, ok := present[d]
+		if !ok {
+			uniques = append(uniques, d)
+			present[d] = true
+		}
+	}
+
+	return uniques
+}
