@@ -6,7 +6,7 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-var providedTestInput = []string{
+var day1ProvidedTestInput = []string{
 	"1000",
 	"2000",
 	"3000",
@@ -29,7 +29,7 @@ func TestDay1Part1(t *testing.T) {
 		expected int
 	}{
 		{
-			providedTestInput,
+			day1ProvidedTestInput,
 			24000,
 		},
 	}
@@ -45,7 +45,7 @@ func TestDay1Part2(t *testing.T) {
 		expected int
 	}{
 		{
-			providedTestInput,
+			day1ProvidedTestInput,
 			45000,
 		},
 	}
