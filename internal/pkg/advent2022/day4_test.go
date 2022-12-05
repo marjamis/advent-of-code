@@ -1,7 +1,6 @@
 package advent2022
 
 import (
-	"fmt"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -39,8 +38,7 @@ func TestDay4Part1(t *testing.T) {
 		},
 	}
 
-	for index, test := range tests {
-		fmt.Println(index)
+	for _, test := range tests {
 		assert.Equal(t, test.expected, Day4Part1(test.input))
 	}
 }
