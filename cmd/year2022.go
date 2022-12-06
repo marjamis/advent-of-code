@@ -41,6 +41,12 @@ var days2022 = map[string]day{
 			fmt.Println(advent2022.Day5Part1(data))
 			fmt.Println(advent2022.Day5Part2(data))
 		}},
+	"06": {
+		Function: func() {
+			data := helpers.ReadString(dataDirectory2022 + "day6.txt")
+			fmt.Println(advent2022.Day6Part1(data))
+			fmt.Println(advent2022.Day6Part2(data))
+		}},
 }
 
 // year2022Cmd represents the year2022 command
