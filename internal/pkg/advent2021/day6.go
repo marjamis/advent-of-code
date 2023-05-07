@@ -1,7 +1,7 @@
 package advent2021
 
 import (
-	"fmt"
+	log "github.com/sirupsen/logrus"
 )
 
 // Lanternfish contains the attributes of each inidividual Lanternfish
@@ -11,13 +11,6 @@ type Lanternfish struct {
 
 // School contains all the Lanternfish that are born
 type School []Lanternfish
-
-func (s School) printState() {
-	for _, fish := range s {
-		fmt.Printf("%d, ", fish.timer)
-	}
-	fmt.Println()
-}
 
 // decreaseTimer will decrease the timer for the Laternfish to give birth and indicate if it has given birth
 func (lf *Lanternfish) decreaseTimer() (spawnChildFish bool) {
@@ -47,11 +40,6 @@ func simulateSchoolGrowth(school School, daysToSimulate int) int {
 	return len(school)
 }
 
-// calculateSchoolGrowth simulates the number of fish after the provided number of days
-func calculateSchoolGrowth(initialTimer, daysToCalculate int) int {
-	return 0
-}
-
 // Day6Part1 returns the number of fish
 func Day6Part1(initialTimers []int, daysToSimulate int) int {
 	school := make(School, len(initialTimers))
@@ -69,18 +57,25 @@ func Day6Part1(initialTimers []int, daysToSimulate int) int {
 // Day6Part2 calculates the number of fish after the provided number of days
 func Day6Part2(initialTimers []int, daysToCalculate int) (schoolSize int) {
 	// Calculating the number of fish spawned based off of each possible initial timer based on the number of days
-	initials := []int{
-		0,
-		calculateSchoolGrowth(1, daysToCalculate),
-		calculateSchoolGrowth(2, daysToCalculate),
-		calculateSchoolGrowth(3, daysToCalculate),
-		calculateSchoolGrowth(4, daysToCalculate),
-		calculateSchoolGrowth(5, daysToCalculate),
+	timeLeftDistribution := []int{0, 0, 0, 0, 0, 0, 0, 0, 0}
+
+	for _, age := range initialTimers {
+		timeLeftDistribution[age]++
 	}
 
-	// With the initial timers calculated we can loop through each actual fish with their initial timers to get the total
-	for _, laternfish := range initialTimers {
-		schoolSize += initials[laternfish]
+	log.Debugf("Initial state: %v", timeLeftDistribution)
+
+	for day := 1; day <= daysToCalculate; day++ {
+		numberOfFishBorn := timeLeftDistribution[0]
+		// Added to position 7 as it's in the same day and with the next day theyll be in position 6 as expected
+		timeLeftDistribution[7] += numberOfFishBorn
+		timeLeftDistribution = append(timeLeftDistribution[1:], numberOfFishBorn)
+
+		log.Debugf("After %d day: %v", day, timeLeftDistribution)
+	}
+
+	for _, n := range timeLeftDistribution {
+		schoolSize += n
 	}
 
 	return schoolSize

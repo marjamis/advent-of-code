@@ -47,7 +47,7 @@ var days2021 = map[string]day{
 			// Only the first line from the input is required
 			input := helpers.ReadIntCSV(dataDirectory2021 + "day6.csv")[0]
 			fmt.Println(advent2021.Day6Part1(input, 80))
-			// fmt.Println(advent2021.Day6Part2(input[0], 256))
+			fmt.Println(advent2021.Day6Part2(input, 256))
 		}},
 	"07": {
 		Function: func() {
