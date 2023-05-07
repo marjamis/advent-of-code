@@ -9,7 +9,7 @@ import (
 )
 
 type paperPoint struct {
-	row, col int
+	col, row int
 }
 
 type paperPoints []paperPoint
@@ -17,7 +17,19 @@ type paperPoints []paperPoint
 // Paper is the representation of the paper after each fold
 type Paper [][]string
 
-func getCoordinates(coordinates []string) []paperPoint {
+func splitInstructionsAndCoordinates(rawData []string) (instructions []string, coordinates []string) {
+	for _, row := range rawData {
+		if strings.Contains(row, "fold along") {
+			instructions = append(instructions, row)
+		} else if strings.Contains(row, ",") {
+			coordinates = append(coordinates, row)
+		}
+	}
+
+	return
+}
+
+func getCoordinates(coordinates []string) paperPoints {
 	paperPoints := make([]paperPoint, len(coordinates))
 
 	for index, coordinate := range coordinates {
@@ -33,15 +45,15 @@ func getCoordinates(coordinates []string) []paperPoint {
 		}
 
 		paperPoints[index] = paperPoint{
-			row: row,
 			col: col,
+			row: row,
 		}
 	}
 
 	return paperPoints
 }
 
-func getPaperSize(paperPoints []paperPoint) (colSize, rowSize int) {
+func getPaperLengths(paperPoints []paperPoint) (colSize, rowSize int) {
 	for _, paperPoint := range paperPoints {
 		if paperPoint.col > colSize {
 			colSize = paperPoint.col
@@ -52,7 +64,7 @@ func getPaperSize(paperPoints []paperPoint) (colSize, rowSize int) {
 		}
 	}
 
-	// The +1's is because the largest point found doesn't take into account the 0 index
+	// The +1's is because the lengths are one larger than the biggest value
 	return colSize + 1, rowSize + 1
 }
 
@@ -68,82 +80,62 @@ func createBlankPaper(colSize, rowSize int) Paper {
 	return paper
 }
 
-func loadPaper(stringCoordinates []string) Paper {
-	coordinates := getCoordinates(stringCoordinates)
-	colSize, rowSize := getPaperSize(coordinates)
+func (points paperPoints) addPointsToPaper(colSize, rowSize int) Paper {
 	paper := createBlankPaper(colSize, rowSize)
 
-	for _, coordinate := range coordinates {
+	for _, coordinate := range points {
 		paper[coordinate.row][coordinate.col] = "#"
 	}
 
 	return paper
 }
 
-func (paper Paper) foldOnHorizontalLine(foldAtLine int) Paper {
-	newPaper := createBlankPaper(len(paper[0]), foldAtLine)
-
-	for _, col := range paper[foldAtLine] {
-		if col == "#" {
-			log.Fatal(fmt.Sprintf("Horizontal fold at line issue: %d\n", foldAtLine))
-		}
+func indexAfterFold(initialIndex, foldAtLine, maxIndex int) int {
+	if initialIndex == foldAtLine {
+		log.Fatal("error: existing index on fold line")
 	}
 
-	for inner, outer := 0, len(paper)-1; inner < foldAtLine; inner, outer = inner+1, outer-1 {
-		for col := 0; col < len(paper[0]); col++ {
-			if paper[inner][col] == "#" || paper[outer][col] == "#" {
-				newPaper[inner][col] = "#"
+	if initialIndex < foldAtLine {
+		return initialIndex
+	}
+
+	calculatedIndex := maxIndex - initialIndex
+	if calculatedIndex < 0 || calculatedIndex >= foldAtLine {
+		log.Fatal("error: calculated index outside the expected bounds")
+	}
+
+	return calculatedIndex
+}
+
+func createFoldedPaper(instructions []string, coordinates []string) Paper {
+	coords := getCoordinates(coordinates)
+	// Initial "guessimate" of paper length if not overwritten below
+	colLength, rowLength := getPaperLengths(coords)
+
+	for _, instruction := range instructions {
+		lineString := strings.Split(instruction, "=")[1]
+		foldAtIndex, err := strconv.Atoi(lineString)
+
+		if err != nil {
+			log.Fatal(err)
+		}
+
+		if strings.Contains(instruction, "x") {
+			for i := range coords {
+				coords[i].col = indexAfterFold(coords[i].col, foldAtIndex, (foldAtIndex * 2))
 			}
-		}
-	}
 
-	return newPaper
-}
-
-func (paper Paper) foldOnVerticalLine(foldAtLine int) Paper {
-	newPaper := createBlankPaper(foldAtLine, len(paper))
-
-	for row := range paper {
-		if paper[row][foldAtLine] == "#" {
-			log.Fatal(fmt.Sprintf("Vertical fold at line issue: %d", foldAtLine))
-		}
-	}
-
-	for row := 0; row < len(paper); row++ {
-		for inner, outer := 0, len(paper[row])-1; inner < foldAtLine; inner, outer = inner+1, outer-1 {
-			if paper[row][inner] == "#" || paper[row][outer] == "#" {
-				newPaper[row][inner] = "#"
+			colLength = foldAtIndex
+		} else {
+			for i := range coords {
+				coords[i].row = indexAfterFold(coords[i].row, foldAtIndex, (foldAtIndex * 2))
 			}
+
+			rowLength = foldAtIndex
 		}
 	}
 
-	return newPaper
-}
-
-func splitCoordinatesAndInstructions(rawData []string) (instructions []string, coordinates []string) {
-	for _, row := range rawData {
-		if strings.Contains(row, "fold along") {
-			instructions = append(instructions, row)
-		} else if strings.Contains(row, ",") {
-			coordinates = append(coordinates, row)
-		}
-	}
-
-	return
-}
-
-func (paper Paper) fold(instruction string) Paper {
-	lineString := strings.Split(instruction, "=")[1]
-	line, err := strconv.Atoi(lineString)
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	if strings.Contains(instruction, "x") {
-		paper = paper.foldOnVerticalLine(line)
-	} else {
-		paper = paper.foldOnHorizontalLine(line)
-	}
+	paper := coords.addPointsToPaper(colLength, rowLength)
 
 	return paper
 }
@@ -160,15 +152,8 @@ func (paper Paper) countDots() (count int) {
 	return
 }
 
-func (paper Paper) print() {
-	for _, row := range paper {
-		fmt.Println(row)
-	}
-	fmt.Println()
-}
-
-func (paper Paper) sprintf() string {
-	formatted := ""
+func (paper Paper) display() string {
+	formatted := "----\n"
 	for _, row := range paper {
 		for _, col := range row {
 			if col == "." {
@@ -179,110 +164,27 @@ func (paper Paper) sprintf() string {
 		}
 		formatted += "\n"
 	}
-	formatted += "\n"
+	formatted += "----\n"
 
 	return formatted
 }
 
-func (points paperPoints) loadPaperPoints(colSize, rowSize int) Paper {
-	paper := createBlankPaper(colSize, rowSize)
+// Day13Part1 returns the calculated version for the number of dots visible after the first fold
+func Day13Part1(rawData []string) int {
+	instructions, coordinates := splitInstructionsAndCoordinates(rawData)
 
-	for _, coordinate := range points {
-		paper[coordinate.row][coordinate.col] = "#"
-	}
-
-	return paper
-}
-
-func positionAfterFold(index, foldAtLine, maxIndex int) int {
-	if index < foldAtLine {
-		return index
-	}
-
-	if index == foldAtLine {
-		return -1
-	}
-
-	return maxIndex - index
-}
-
-func calculatedPaper(instructions []string, coordinates []string) Paper {
-	coords := paperPoints(getCoordinates(coordinates))
-	colSize, rowSize := getPaperSize(coords)
-
-	for _, instruction := range instructions {
-		lineString := strings.Split(instruction, "=")[1]
-		foldAtLine, err := strconv.Atoi(lineString)
-		if err != nil {
-			log.Fatal(err)
-		}
-
-		if strings.Contains(instruction, "x") {
-			for i := range coords {
-				coords[i].col = positionAfterFold(coords[i].col, foldAtLine, colSize-1)
-				if coords[i].col == -1 {
-					coords[i].col = 0
-					coords[i].row = 0
-				}
-			}
-
-			colSize = (colSize) / 2
-		} else {
-			for i := range coords {
-				coords[i].row = positionAfterFold(coords[i].row, foldAtLine, rowSize-1)
-				if coords[i].row == -1 {
-					coords[i].row = 0
-					coords[i].col = 0
-				}
-			}
-
-			rowSize = (rowSize) / 2
-		}
-	}
-
-	paper := coords.loadPaperPoints(colSize, rowSize)
-
-	return paper
-}
-
-// Day13Part1Simulated returns the simulated version for the number of dots visible after the first fold
-func Day13Part1Simulated(rawData []string) int {
-	instructions, coordinates := splitCoordinatesAndInstructions(rawData)
-
-	paper := loadPaper(coordinates)
-	paper = paper.fold(instructions[0])
-
-	return paper.countDots()
-}
-
-// Day13Part1Calculated returns the calculated version for the number of dots visible after the first fold
-func Day13Part1Calculated(rawData []string) int {
-	instructions, coordinates := splitCoordinatesAndInstructions(rawData)
-
-	paper := calculatedPaper([]string{
+	paper := createFoldedPaper([]string{
 		instructions[0],
 	}, coordinates)
 
 	return paper.countDots()
 }
 
-// Day13Part2Simulated displays the simulated version of the 8 letters (in ASCII picture format) which is the code for the thermal camera
-func Day13Part2Simulated(rawData []string) string {
-	instructions, coordinates := splitCoordinatesAndInstructions(rawData)
+// Day13Part2 displays the calculated version of the 8 letters (in ASCII picture format) which is the code for the thermal camera
+func Day13Part2(rawData []string) string {
+	instructions, coordinates := splitInstructionsAndCoordinates(rawData)
 
-	paper := loadPaper(coordinates)
-	for _, instruction := range instructions {
-		paper = paper.fold(instruction)
-	}
+	paper := createFoldedPaper(instructions, coordinates)
 
-	return paper.sprintf()
-}
-
-// Day13Part2Calculated displays the calculated version of the 8 letters (in ASCII picture format) which is the code for the thermal camera
-func Day13Part2Calculated(rawData []string) string {
-	instructions, coordinates := splitCoordinatesAndInstructions(rawData)
-
-	paper := calculatedPaper(instructions, coordinates)
-
-	return paper.sprintf()
+	return paper.display()
 }
