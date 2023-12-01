@@ -3,6 +3,8 @@
 COMMAND_LINE_OPTIONS_HELP="Advent of Code helper"
 
 ADVENT_SESSION=$(cat ~/.advent-of-code_cookie)
+TEST_DIR="./test"
+CODE_DIR="./internal/pkg"
 
 function help {
     echo "Usage: helper -h for help";
@@ -24,12 +26,17 @@ function action_new_day {
     year=$(gum input --prompt "What year? " --value $(date "+%Y"))
     day=$(gum input --prompt "What day? " --value $(date "+%e"))
 
-    curl --cookie "session=$ADVENT_SESSION" -o ./test/advent$year/day$day.txt https://adventofcode.com/$year/day/$day/input
+    if [ "$day" == "1" ] ; then
+        mkdir $TEST_DIR/advent$year/
+        mkdir $CODE_DIR/advent$year/
+    fi
+
+    curl --cookie "session=$ADVENT_SESSION" -o $TEST_DIR/advent$year/day$day.txt https://adventofcode.com/$year/day/$day/input
 
     gh issue create -R marjamis/advent-of-code --title "Year $year - Day $day" --label "enhancement" --assignee @me --body "Complete the days challenge."
 
-    echo "package advent$year" > internal/pkg/advent$year/day$day.go
-    echo "package advent$year" > internal/pkg/advent$year/day$(echo $day)_test.go
+    echo "package advent$year" > $CODE_DIR/advent$year/day$day.go
+    echo "package advent$year" > $CODE_DIR/advent$year/day$(echo $day)_test.go
 }
 
 function select_action {
