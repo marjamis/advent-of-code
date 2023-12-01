@@ -2,6 +2,7 @@
     "conventionalCommits.scopes": [
         "2022",
         "helper",
-        "2021"
+        "2021",
+        "2023"
     ]
 }
