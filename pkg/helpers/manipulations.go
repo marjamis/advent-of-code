@@ -6,6 +6,11 @@ type ArrayTypes interface {
 	int | int32 | int64 | float32 | float64 | ~string
 }
 
+type MatrixCoordinates struct {
+	Row int
+	Col int
+}
+
 // Permutations generates all possible combinations from the input data
 func Permutations(xs []int16) (permuts [][]int16) {
 	// Taken from: https://www.golangprograms.com/golang-program-to-generate-slice-permutations-of-number-entered-by-user.html
@@ -29,6 +34,51 @@ func Permutations(xs []int16) (permuts [][]int16) {
 // IsLocationValid returns if the provided x,y coordinates are within the range of the provided 2d array.
 func IsLocationValid[T ArrayTypes](arr [][]T, x, y int) bool {
 	return (x >= 0) && (x < len(arr[0])) && (y >= 0) && (y < len(arr))
+}
+
+func FindSurroundingCoordinates(currentPosition MatrixCoordinates, includeDiagonal bool) []MatrixCoordinates {
+	surroundingLocations := []MatrixCoordinates{
+		{
+			Col: currentPosition.Col,
+			Row: currentPosition.Row - 1,
+		},
+		{
+			Col: currentPosition.Col,
+			Row: currentPosition.Row + 1,
+		},
+		{
+			Col: currentPosition.Col + 1,
+			Row: currentPosition.Row,
+		},
+		{
+			Col: currentPosition.Col - 1,
+			Row: currentPosition.Row,
+		},
+	}
+
+	if includeDiagonal {
+		diagonal := []MatrixCoordinates{
+			{
+				Col: currentPosition.Col - 1,
+				Row: currentPosition.Row - 1,
+			},
+			{
+				Col: currentPosition.Col + 1,
+				Row: currentPosition.Row + 1,
+			},
+			{
+				Col: currentPosition.Col + 1,
+				Row: currentPosition.Row - 1,
+			},
+			{
+				Col: currentPosition.Col - 1,
+				Row: currentPosition.Row + 1,
+			},
+		}
+		surroundingLocations = append(surroundingLocations, diagonal...)
+	}
+
+	return surroundingLocations
 }
 
 // Abs is simple function to return the absolute value of an integer. Absolute value being essentially an always positive number.
