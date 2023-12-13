@@ -9,6 +9,7 @@ import (
 	"log"
 	"os"
 	"strconv"
+	"strings"
 )
 
 // ReadIntArray reads from file and returns an []int
@@ -48,7 +49,7 @@ func ReadString(file string) string {
 		return ""
 	}
 
-	return string(data)
+	return strings.TrimSuffix(string(data), "\n")
 }
 
 // ReadStringArray2d reads from file and returns a [][]string
