@@ -50,3 +50,13 @@ func (s *Stack) Pop() (value interface{}) {
 
 	return
 }
+
+// CreateStack creates an new empty Stack
+func CreateStack() *Stack {
+	return &Stack{}
+}
+
+// IsEmpty returns true if the stack is empty
+func (s *Stack) IsEmpty() bool {
+	return (s.value == nil) && (s.previous == nil) && (s.next == nil)
+}
