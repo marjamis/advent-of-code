@@ -23,6 +23,10 @@ type Node struct {
 // Nodes a map of Nodes in the graph
 type Nodes map[string]Node
 
+func CreateNodeMap() Nodes {
+	return Nodes{}
+}
+
 func (nodes Nodes) createNode(nodeName string) {
 	_, ok := nodes[nodeName]
 	if !ok {
@@ -54,14 +58,14 @@ func (nodes Nodes) createEdge(source, destination string, directed bool) {
 	nodes[source] = tmpNode
 }
 
-// createDirectedEdge creates an Edge object and assigns it to the source node
-func (nodes Nodes) createDirectedEdge(source, destination string) {
+// CreateDirectedEdge creates an Edge object and assigns it to the source node
+func (nodes Nodes) CreateDirectedEdge(source, destination string) {
 	nodes.createEdge(source, destination, true)
 }
 
-// createDirectedEdge creates an Edge object and assigns it to the source and destination node
+// CreateUndirectedEdge creates an Edge object and assigns it to the source and destination node
 // as the traversal can go in both directions
-func (nodes Nodes) createUndirectedEdge(source, destination string) {
+func (nodes Nodes) CreateUndirectedEdge(source, destination string) {
 	nodes.createEdge(source, destination, false)
 	nodes.createEdge(destination, source, false)
 }
@@ -88,13 +92,13 @@ func LoadNodes(rawData []string, delimiter string) (nodes Nodes) {
 			}
 
 			if directed {
-				nodes.createDirectedEdge(sourceNode, destinationNode)
+				nodes.CreateDirectedEdge(sourceNode, destinationNode)
 			} else {
-				nodes.createUndirectedEdge(sourceNode, destinationNode)
+				nodes.CreateUndirectedEdge(sourceNode, destinationNode)
 			}
 		} else {
 			// If nodes don't already exist they will also be created
-			nodes.createUndirectedEdge(sourceNode, destinationNode)
+			nodes.CreateUndirectedEdge(sourceNode, destinationNode)
 		}
 
 		// If the optional third field is provided this is used as the weight for the edge for both

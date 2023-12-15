@@ -33,7 +33,7 @@ func TestCreateEdge(t *testing.T) {
 		_, ok = nodes[testEdgeDestination]
 		assert.False(t, ok)
 
-		nodes.createUndirectedEdge(testEdgeSource, testEdgeDestination)
+		nodes.CreateUndirectedEdge(testEdgeSource, testEdgeDestination)
 
 		// SourceNode and Edge details should be created
 		sourceNode, ok := nodes[testEdgeSource]
@@ -61,7 +61,7 @@ func TestCreateEdge(t *testing.T) {
 		_, ok = nodes[testEdgeDestination]
 		assert.False(t, ok)
 
-		nodes.createDirectedEdge(testEdgeSource, testEdgeDestination)
+		nodes.CreateDirectedEdge(testEdgeSource, testEdgeDestination)
 
 		// SourceNode and Edge details should be created
 		sourceNode, ok := nodes[testEdgeSource]
