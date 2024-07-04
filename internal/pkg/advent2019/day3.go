@@ -14,7 +14,7 @@ type coordinates struct {
 }
 
 const (
-	gridLength  = 25000
+	gridLength  = 30000
 	startPointX = gridLength / 2
 	startPointY = gridLength / 2
 )
@@ -34,13 +34,13 @@ func day3AddWirePoint(flag int, grid *[gridLength][gridLength]int, x int, y int)
 		grid[x][y] = flag
 	}
 
-	// if flag == 1 {
-	// 	wire1CoordinatesPath = append(wire1CoordinatesPath, &coordinates{x, y})
-	// }
+	if flag == 1 {
+		wire1CoordinatesPath = append(wire1CoordinatesPath, &coordinates{x, y})
+	}
 
-	// if flag == 2 {
-	// 	wire2CoordinatesPath = append(wire2CoordinatesPath, &coordinates{x, y})
-	// }
+	if flag == 2 {
+		wire2CoordinatesPath = append(wire2CoordinatesPath, &coordinates{x, y})
+	}
 }
 
 func day3Direction(flag int, instruction string, grid *[gridLength][gridLength]int, x int, y int) (int, int) {
