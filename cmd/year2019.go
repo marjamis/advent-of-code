@@ -29,7 +29,7 @@ var days2019 = map[string]day{
 		Function: func() {
 			data := helpers.ReadStringCSV(dataDirectory2019 + "day3.csv")
 			fmt.Println(advent2019.Day3(data[0], data[1], advent2019.Day3Manhattan))
-			// fmt.Println(advent2019.Day3(data[0], data[1], advent2019.Day3Steps))
+			fmt.Println(advent2019.Day3(data[0], data[1], advent2019.Day3Steps))
 		}},
 	"04": {
 		Function: func() {

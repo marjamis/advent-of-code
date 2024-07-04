@@ -1,7 +1,6 @@
 package advent2019
 
 import (
-	"fmt"
 	"strconv"
 	"strings"
 )
@@ -48,10 +47,6 @@ func Day4Rules2(num int) bool {
 			}
 		}
 
-	}
-
-	if hasSameAdjacent && isAscending {
-		fmt.Println(num)
 	}
 
 	return hasSameAdjacent && isAscending
