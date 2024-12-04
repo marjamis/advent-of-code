@@ -31,7 +31,14 @@ func Permutations(xs []int16) (permuts [][]int16) {
 	return permuts
 }
 
+func IsArrayLocationValid[T ArrayTypes](arr [][]T, row, col int) bool {
+	return (col >= 0) && (col < len(arr[0])) && (row >= 0) && (row < len(arr))
+}
+
 // IsLocationValid returns if the provided x,y coordinates are within the range of the provided 2d array.
+//
+// Deprecated: The x, y format is confusing when using with arrays as values have to be inversed.
+// Use IsArrayLocationValid instead.
 func IsLocationValid[T ArrayTypes](arr [][]T, x, y int) bool {
 	return (x >= 0) && (x < len(arr[0])) && (y >= 0) && (y < len(arr))
 }
